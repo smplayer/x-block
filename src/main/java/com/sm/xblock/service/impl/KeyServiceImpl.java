@@ -85,11 +85,12 @@ public class KeyServiceImpl extends GenericServiceImpl<Key, String> implements K
 
             String s = fixLenthString1.substring(2, length + 1) + chars + fixLenthString2.substring(2, length + 1);
 
-            Key existingKey = get(Conditions.newInstance().eq("content", s));
+            Key existingKey = null;
+            existingKey = get(Conditions.newInstance().eq("content", s));
             if (existingKey == null) {
-                Key newKey = new Key();
-                newKey.setContent(s);
-                save(newKey);
+//                Key newKey = new Key();
+//                newKey.setContent(s);
+//                save(newKey);
                 p.println(s);
                 System.out.println(s);
             } else {
