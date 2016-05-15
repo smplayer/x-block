@@ -17,3 +17,5 @@
 #        !/fw/sf/
 /build
 /out
+/.gradle
+/.idea
