@@ -9,9 +9,9 @@ apply plugin: 'jetty'
 sourceCompatibility = 1.7
 
 repositories {
-    maven {
-        url "http://localhost:8081/repository/maven-central/"
-    }
+//    maven {
+//        url "http://localhost:8081/repository/maven-public/"
+//    }
     mavenLocal()
     mavenCentral()
 

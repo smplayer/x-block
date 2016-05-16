@@ -1,7 +1,9 @@
 package com.sm.xblock.controller;
 
+import com.sm.xblock.SaveKeysToDBEvent;
 import com.sm.xblock.service.KeyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 public class IndexController {
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Autowired
     private KeyService keyService;
@@ -22,6 +26,13 @@ public class IndexController {
     public String generate(){
         keyService.generate(6);
         return "generated";
+    }
+
+    @RequestMapping("asyncGenerate")
+    @ResponseBody
+    public String asyncGenerate(){
+        applicationContext.publishEvent(new SaveKeysToDBEvent("save"));
+        return "generating";
     }
 
     @RequestMapping(value = "test/cal", method = RequestMethod.GET)

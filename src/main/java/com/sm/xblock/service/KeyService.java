@@ -10,4 +10,6 @@ public interface KeyService extends GenericService<Key, String> {
 
     void generate(Integer length);
 
+    void saveKeysToDB();
+
 }

@@ -9,9 +9,10 @@ import com.sm.xblock.service.KeyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -34,15 +35,15 @@ public class KeyServiceImpl extends GenericServiceImpl<Key, String> implements K
         try {
             String chars = null;
 
-            for(int r = 0; r < 2; r++){
+            for (int r = 0; r < 2; r++) {
                 char c1 = 'A';
                 char c2 = 'A';
 
-                if(r == 0){
-                    for(; c1 <= 'Z'; c1++){
+                if (r == 0) {
+                    for (; c1 <= 'Z'; c1++) {
                         chars = String.valueOf(c1);
 
-                        FileOutputStream out = new FileOutputStream("O:/keys/keys" + chars +".txt");
+                        FileOutputStream out = new FileOutputStream("O:/keys/keys" + chars + ".txt");
                         PrintStream p = new PrintStream(out);
 
                         toSN(chars, p, rm, length);
@@ -50,11 +51,11 @@ public class KeyServiceImpl extends GenericServiceImpl<Key, String> implements K
                         p.close();
                     }
                 } else {
-                    for(; c1 <= 'Z'; c1++){
-                        for(;c2 <= 'Z'; c2++){
+                    for (; c1 <= 'Z'; c1++) {
+                        for (; c2 <= 'Z'; c2++) {
                             chars = String.valueOf(new char[]{c1, c2});
 
-                            FileOutputStream out = new FileOutputStream("O:/keys/keys" + chars +".txt");
+                            FileOutputStream out = new FileOutputStream("O:/keys/keys" + chars + ".txt");
                             PrintStream p = new PrintStream(out);
 
                             toSN(chars, p, rm, length);
@@ -70,8 +71,8 @@ public class KeyServiceImpl extends GenericServiceImpl<Key, String> implements K
     }
 
 
-    private void toSN(String chars, PrintStream p, Random rm, Integer length){
-        for(int i = 0; i < 50000; i++) {
+    private void toSN(String chars, PrintStream p, Random rm, Integer length) {
+        for (int i = 0; i < 50000; i++) {
 
             // 获得随机数
             double pross1 = (1 + rm.nextDouble()) * Math.pow(10, length);
@@ -99,4 +100,60 @@ public class KeyServiceImpl extends GenericServiceImpl<Key, String> implements K
 
         }
     }
+
+    @Override
+    public void saveKeysToDB() {
+        new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                    }
+                }
+        ).start();
+
+        System.out.println("waiting......");
+
+        File file = new File("O:/keys/keysA.txt");
+        BufferedReader reader;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+
+            List<String> keys = new ArrayList<>();
+            String tempString;
+            int line = 0;
+
+            // 一次读入一行，直到读入null为文件结束
+            Long startTime = new Date().getTime();
+            while ((tempString = reader.readLine()) != null) {
+                // 行号
+                line++;
+
+                keys.add(tempString);
+                if(keys.size() == 10000){
+                    keyDao.saveKeys(keys);
+                    keys = new ArrayList<>();
+                    System.out.println("已保存: " + line + " 项");
+                }
+
+            }
+            Long endTime = new Date().getTime();
+            System.out.println("time: " + (endTime - startTime));
+
+
+            keyDao.saveKeys(keys);
+            System.out.println("已保存全部: " + line + " 项");
+
+            reader.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void main(String[] args) {
+        new KeyServiceImpl().saveKeysToDB();
+    }
+
 }
